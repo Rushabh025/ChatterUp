@@ -1,2 +1,22 @@
 # ChatterUp
-The aim of the ChatterUp project is to create an interactive real-time chat application, facilitating seamless communication and interaction between users. This application will be built using Node.js, ExpressJS, Socket.io, and MongoDB to provide a robust and engaging chat experience.
+
+A real-time chat application built with Node.js, Express, Socket.io, and MongoDB.
+
+## Features
+
+- Real-time messaging
+- User onboarding
+- Chat history
+- Typing indicators
+- Notifications for new users and disconnections
+
+## Setup
+
+1. Clone the repository.
+2. Run `npm install` to install dependencies.
+3. Create a `.env` file in the root with the required environment variables.
+4. Run `npm run dev` for development.
+
+## License
+
+MIT
