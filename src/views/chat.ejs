@@ -1,68 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ChatterUp - Chat Room</title>
-  <link rel="stylesheet" href="/css/styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
 </head>
 <body>
-  <div class="chat-container">
-    <!-- Left Panel: Chat Area -->
-    <div class="chat-panel">
-      <!-- Header (shows "Welcome [username]" or "Someone is typing...") -->
-      <div class="chat-header">
-        <span id="chat-header-text">Welcome, <%= username || 'Guest' %>!</span>
-        <span id="typing-indicator" class="typing-indicator"></span>
-      </div>
 
-      <!-- Chat Messages -->
-      <div id="chat-messages" class="chat-messages">
-        <% if (messages && messages.length) { %>
-          <% messages.forEach((message) => { %>
-            <div class="message">
-              <div class="avatar">
-                <img 
-                  src="<%= message.profilePicture || '/images/default-profile.png' %>" 
-                  alt="Profile Picture"
-                />
-              </div>
-              <div class="bubble">
-                <div class="bubble-header">
-                  <span class="user-name"><%= message.sender %></span>
-                  <span class="timestamp">
-                    <%= new Date(message.timestamp).toLocaleTimeString() %>
-                  </span>
-                </div>
-                <div class="bubble-content">
-                  <%= message.content %>
-                </div>
-              </div>
-            </div>
-          <% }) %>
-        <% } %>
-      </div>
+    <h2>Chat Room</h2>
 
-      <!-- Message Input -->
-      <form id="message-form" class="message-form">
-        <input 
-          type="text" 
-          id="message-input" 
-          class="message-input" 
-          placeholder="Enter your message..." 
-          autocomplete="off" 
-        />
-        <button type="submit" class="send-btn">Send</button>
-      </form>
-    </div>
+    <ul id="messages">
+        <!-- Dynamically poplate messages -->
+    </ul>
 
-    <!-- Right Panel: Connected Users -->
-    <div class="user-panel">
-      <h2>Connected Users</h2>
-      <ul id="users-list"></ul>
-    </div>
-  </div>
+    <input id="messageInput" autocomplete="off">
+    
+    <button id="sendBtn">Send</button>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/main.js"></script>
+    <!-- Include Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const input = document.getElementById("messageInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const messagesList = document.getElementById("messages");
+
+        sendBtn.addEventListener("click", () => {
+            if (input.value.trim()) {
+                socket.emit("chat message", input.value);
+                input.value = "";
+            }
+        });
+
+        socket.on("chat message", (msg) => {
+            const li = document.createElement("li");
+            li.textContent = msg;
+            messagesList.appendChild(li);
+        });
+    </script>
 </body>
 </html>

@@ -1,40 +1,47 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import chatRoutes from './routes/chat.routes.js';
-import userRoutes from './routes/user.routes.js';
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const app = express();
-
-// Set __dirname in ES modules
+// Setup ES6 module dirname (__dirname replacement)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware to parse JSON and URL-encoded data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+export const app = express();
+app.use(cors());
 
-// Serve static files from the public folder
-app.use(express.static(path.join(__dirname, '../public')));
+// Set EJS as the view engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-// Set up view engine (EJS)
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
-// Register API routes
-app.use('/api/chat', chatRoutes);
-app.use('/api/user', userRoutes);
-
-// Render the welcome page for onboarding
-app.get('/', (req, res) => {
-  res.render('welcome');
+// Serve the chat page
+app.get("/", (req, res) => {
+    res.render("chat"); // Renders views/chat.ejs
 });
 
-// Render the chat room (optionally preload chat history)
-app.get('/chat', (req, res) => {
-  const username = 'SomeUser'; // Or get from session/local storage
-  res.render('chat', { username, messages: [] });
+export const server = http.createServer(app);
+
+const io = new Server(server,{
+    cors:{
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
 });
 
+// Socket.io connection event
+io.on("connection", (socket) => {
+  console.log("A user connected");
 
-export default app;
+  // Listen for messages from the client
+  socket.on("chat message", (msg) => {
+    console.log("Message received:", msg);
+    io.emit("chat message", msg); // Broadcast to all clients
+  });
+
+  // Handle user disconnect
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
