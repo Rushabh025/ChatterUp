@@ -15,13 +15,13 @@ export const init = (server) =>{
     
         // Listen for messages from the client
         socket.on("chat message", (msg) => {
-        console.log("Message received:", msg);
-        io.emit("chat message", msg); // Broadcast to all clients
+            console.log("Message received:", msg);
+            io.emit("chat message", msg); // Broadcast to all clients
         });
     
         // Handle user disconnect
         socket.on("disconnect", () => {
-        console.log("A user disconnected");
+            console.log("A user disconnected");
         });
     });
   
