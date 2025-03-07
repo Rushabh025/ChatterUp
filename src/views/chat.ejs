@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat App</title>
+    <style>
+        .notification {
+            color: gray;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
 
@@ -21,6 +27,9 @@
         <button id="sendBtn">Send</button>
     </div>
 
+    <h4>Active Users</h4>
+    <ul id="activeUsers"></ul>
+
     <!-- Include Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -29,8 +38,11 @@
         const input = document.getElementById("messageInput");
         const sendBtn = document.getElementById("sendBtn");
         const messagesList = document.getElementById("messages");
-
+        const activeUsersList = document.getElementById("activeUsers");
         const username = "<%= username %>"; // Get the username from EJS
+
+        // Notify server of user joining
+        socket.emit("userJoined", username);
 
         sendBtn.addEventListener("click", () => {
             if (input.value.trim()) {
@@ -50,6 +62,34 @@
             const messageElement = document.createElement("div");
             messageElement.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
             chatBox.appendChild(messageElement);
+        }
+
+        // Receive active users list
+        socket.on("updateActiveUsers", (users) => {
+            activeUsersList.innerHTML = ""; // Clear the list
+            users.forEach(user => {
+                const li = document.createElement("li");
+                li.textContent = user;
+                activeUsersList.appendChild(li);
+            });
+        });
+
+        // Show notification when a user joins
+        socket.on("userJoinedNotification", (message) => {
+            displayNotification(message);
+        });
+
+        // Show notification when a user leaves
+        socket.on("userLeftNotification", (message) => {
+            displayNotification(message);
+        });
+
+        function displayNotification(message) {
+            const chatBox = document.getElementById("messages");
+            const notificationElement = document.createElement("div");
+            notificationElement.classList.add("notification");
+            notificationElement.textContent = message;
+            chatBox.appendChild(notificationElement);
         }
 
     </script>

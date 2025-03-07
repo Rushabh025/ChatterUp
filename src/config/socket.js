@@ -1,6 +1,8 @@
 import { Server } from "socket.io";
 import Message from "../models/message.model.js";
 
+const activeUsers = new Set(); // Store active users
+
 export const init = (server) =>{
 
     const io = new Server(server,{
@@ -14,6 +16,19 @@ export const init = (server) =>{
     io.on("connection", async (socket) => {
 
         console.log("User connected:", socket.id);
+
+        // Listen for user joining
+        socket.on("userJoined", (username) => {
+            if (username) {
+                activeUsers.add(username);
+                io.emit("updateActiveUsers", Array.from(activeUsers)); // Send updated list to all clients
+
+                // Notify all users that a new user has joined
+                io.emit("userJoinedNotification", `${username} has joined the chat! 🎉`);
+
+                console.log("Active users:", activeUsers);
+            }
+        });
 
         // Load previous messages from MongoDB and send to newly connected user
         try {
@@ -46,7 +61,23 @@ export const init = (server) =>{
     
         // Handle user disconnect
         socket.on("disconnect", () => {
-            console.log("A user disconnected");
+            let leavingUser = null;
+
+            // Remove user from active list
+            for (let user of activeUsers) {
+                activeUsers.delete(user);
+                leavingUser = user;
+                break; // Only remove one user per disconnect event
+            }
+
+            io.emit("updateActiveUsers", Array.from(activeUsers));
+
+            if (leavingUser) {
+                // Notify all users that someone has left
+                io.emit("userLeftNotification", `${leavingUser} has left the chat. 😢`);
+            }
+
+            console.log("User disconnected:", socket.id);
         });
     });
   
