@@ -11,9 +11,12 @@
 
     <div id="chat-container">
         <h3>Welcome, <%= username %>!</h3>
-        <ul id="messages">
+        <div id="messages">
             <!-- Dynamically poplate messages -->
-        </ul>
+            <% messages.forEach(msg => { %>
+                <div><strong><%= msg.sender %>:</strong> <%= msg.content %></div>
+            <% }); %>
+        </div>
         <input type="text" id="messageInput" placeholder="Type a message...">
         <button id="sendBtn">Send</button>
     </div>
@@ -27,18 +30,28 @@
         const sendBtn = document.getElementById("sendBtn");
         const messagesList = document.getElementById("messages");
 
+        const username = "<%= username %>"; // Get the username from EJS
+
         sendBtn.addEventListener("click", () => {
             if (input.value.trim()) {
-                socket.emit("chat message", input.value);
+                socket.emit("chatMessage", { sender: username, content: input.value });
+                console.log(username, input.value);
                 input.value = "";
             }
         });
 
-        socket.on("chat message", (msg) => {
-            const li = document.createElement("li");
-            li.textContent = msg;
-            messagesList.appendChild(li);
+
+        socket.on("message", (msg) => {
+            displayMessage(msg);
         });
+
+        function displayMessage(msg) {
+            const chatBox = document.getElementById("messages");
+            const messageElement = document.createElement("div");
+            messageElement.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
+            chatBox.appendChild(messageElement);
+        }
+
     </script>
 </body>
 </html>

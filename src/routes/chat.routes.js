@@ -1,4 +1,5 @@
 import express from "express";
+import Message from "../models/message.model.js";
 const router = express.Router();
 
 router.post("/join-chat", (req, res) => {
@@ -14,14 +15,14 @@ router.post("/join-chat", (req, res) => {
   res.status(200).json({ message: "User joined successfully" });
 });
 
-router.get("/chat", (req, res) => {
-  const username = req.query.username || req.session.username; 
-
-  if (!username) {
-    return res.redirect("/");
-  }
-
-  res.render("chat", { username });
+router.get("/chat", async (req, res) => {
+    try {
+        const messages = await Message.find().sort({ timestamp: 1 });
+        res.render("chat", { username: req.query.username || "Anonymous", messages });
+    } catch (err) {
+        console.error("Error fetching messages:", err);
+        res.render("chat", { username: req.query.username || "Anonymous", messages: [] });
+    }
 });
 
 export default router;
