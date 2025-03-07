@@ -1,26 +1,30 @@
 import dotenv from "dotenv";
+dotenv.config();
 import path from "path";
-import { fileURLToPath } from "url";
-
-// Fix __dirname for ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load .env from project root (one level up)
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
-
 import express from "express";
+import session from "express-session";
 import http from "http";
 import cors from "cors";
 import { init } from "./config/socket.js";
+import chatRoutes from './routes/chat.routes.js';
 
 export const app = express();
+
 app.use(cors());
+app.use(express.json());
+app.use(session({
+    secret: "your-secret-key",
+    resave: false,
+    saveUninitialized: true,
+}));
 
-// Set EJS as the view engine
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+// set view engine to render ejs files
+app.set('view engine', 'ejs');
+app.set('views', path.join(path.resolve(), 'src', 'views'));
 
+app.use(express.static("public"));
+app.use(chatRoutes);
+  
 // Serve the chat page
 app.get("/", (req, res) => {
     res.render("welcome"); // Renders views/chat.ejs
