@@ -23,6 +23,10 @@
                 <div><strong><%= msg.sender %>:</strong> <%= msg.content %></div>
             <% }); %>
         </div>
+
+        <!-- Typing Indicator -->
+        <p id="typingIndicator" style="font-style: italic; color: gray;"></p>
+
         <input type="text" id="messageInput" placeholder="Type a message...">
         <button id="sendBtn">Send</button>
     </div>
@@ -39,7 +43,9 @@
         const sendBtn = document.getElementById("sendBtn");
         const messagesList = document.getElementById("messages");
         const activeUsersList = document.getElementById("activeUsers");
+        const typingIndicator = document.getElementById('typingIndicator');
         const username = "<%= username %>"; // Get the username from EJS
+        let typingTimeout;
 
         // Notify server of user joining
         socket.emit("userJoined", username);
@@ -91,6 +97,36 @@
             notificationElement.textContent = message;
             chatBox.appendChild(notificationElement);
         }
+
+        // Emit event when user starts typing
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing', { username }); // Send username to server
+
+            // Clear the timeout if user continues typing
+            clearTimeout(typingTimeout);
+
+            // After 2 seconds of inactivity, stop showing "typing..."
+            typingTimeout = setTimeout(() => {
+                socket.emit('stopTyping', { username });
+            }, 2000);
+        });
+
+        // Listen for typing event
+        socket.on('userTyping', (typingUsers) => {
+            // typingIndicator.innerText = `${username} is typing...`;
+            if (typingUsers.length === 0) {
+                typingIndicator.innerText = "";
+            } else if (typingUsers.length === 1) {
+                typingIndicator.innerText = `${typingUsers[0]} is typing...`;
+            } else {
+                typingIndicator.innerText = `${typingUsers.join(", ")} are typing...`;
+            }
+        });
+
+        // Listen for stopTyping event
+        socket.on('userStoppedTyping', () => {
+            typingIndicator.innerText = ''; // Clear the typing indicator
+        });
 
     </script>
 </body>

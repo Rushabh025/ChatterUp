@@ -18,10 +18,10 @@ router.post("/join-chat", (req, res) => {
 router.get("/chat", async (req, res) => {
     try {
         const messages = await Message.find().sort({ timestamp: 1 });
-        res.render("chat", { username: req.query.username || "Anonymous", messages });
+        res.render("chat", { username: req.query.username, messages });
     } catch (err) {
         console.error("Error fetching messages:", err);
-        res.render("chat", { username: req.query.username || "Anonymous", messages: [] });
+        res.render("chat", { username: req.query.username, messages: [] });
     }
 });
 

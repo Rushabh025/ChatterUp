@@ -2,6 +2,8 @@ import { Server } from "socket.io";
 import Message from "../models/message.model.js";
 
 const activeUsers = new Set(); // Store active users
+const socketUserMap = new Map(); // Map socket.id to username
+const typingUsers = new Set(); // Track users who are typing
 
 export const init = (server) =>{
 
@@ -21,6 +23,8 @@ export const init = (server) =>{
         socket.on("userJoined", (username) => {
             if (username) {
                 activeUsers.add(username);
+                socketUserMap.set(socket.id, username); // Store the username with the socket ID
+
                 io.emit("updateActiveUsers", Array.from(activeUsers)); // Send updated list to all clients
 
                 // Notify all users that a new user has joined
@@ -37,7 +41,30 @@ export const init = (server) =>{
         } catch (err) {
             console.error("Error loading messages:", err);
         }
-    
+
+        // When a user starts typing
+        socket.on('typing', () => {
+            // socket.broadcast.emit('userTyping', data.username);
+            const username = socketUserMap.get(socket.id);
+            console.log(`${username} started typing`); // ✅ Debugging log
+            if (username) {
+                typingUsers.add(username);
+                io.emit("userTyping", Array.from(typingUsers)); // Send all users who are typing
+                console.log("Active users:", typingUsers);
+            }
+        });
+
+        // When a user stops typing
+        socket.on('stopTyping', () => {
+            // socket.broadcast.emit('userStoppedTyping');
+            const username = socketUserMap.get(socket.id);
+            console.log(`${username} stopped typing`); // ✅ Debugging log
+            if (username) {
+                typingUsers.delete(username);
+                io.emit("userTyping", Array.from(typingUsers)); // Update list
+            }
+        });
+        
         // Listen for messages from the client
         socket.on("chatMessage", async ({ sender, content }) => {
             if (!sender || !content) {
@@ -61,23 +88,18 @@ export const init = (server) =>{
     
         // Handle user disconnect
         socket.on("disconnect", () => {
-            let leavingUser = null;
+            const username = socketUserMap.get(socket.id);
 
             // Remove user from active list
-            for (let user of activeUsers) {
-                activeUsers.delete(user);
-                leavingUser = user;
-                break; // Only remove one user per disconnect event
+            if (username) {
+                activeUsers.delete(username); // Remove user from active users
+                socketUserMap.delete(socket.id); // Remove mapping
+                typingUsers.delete(username); // Remove from typing users as well
+
+                io.emit("updateActiveUsers", Array.from(activeUsers)); // Update active users list
+                io.emit("userTyping", Array.from(typingUsers)); // Update typing indicator
+                io.emit("userLeftNotification", `${username} has left the chat. 😢`);
             }
-
-            io.emit("updateActiveUsers", Array.from(activeUsers));
-
-            if (leavingUser) {
-                // Notify all users that someone has left
-                io.emit("userLeftNotification", `${leavingUser} has left the chat. 😢`);
-            }
-
-            console.log("User disconnected:", socket.id);
         });
     });
   
