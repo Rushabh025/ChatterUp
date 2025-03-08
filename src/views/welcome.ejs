@@ -4,14 +4,32 @@
   <meta charset="UTF-8">
   <title>Welcome to ChatterUp</title>
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    #preview {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: none;
+    }
+</style>
 </head>
 <body>
   <div id="welcome-container">
     <h1>Welcome to ChatterUp!</h1>
+
     <form id="onboarding-form">
+      <label for="username">Enter your name:</label>
       <input type="text" id="username" placeholder="Enter your name" required>
+
+      <label for="profilePic">Upload Profile Picture:</label>
+      <input type="file" id="profilePic" accept="image/*">
+
+      <!-- <img id="preview" src="/images/default-profile.jpg" alt="Profile Preview" style="width: 80px; height: 80px; border-radius: 50%; display: block;"> -->
+
       <button type="submit">Join Chat</button>
     </form>
+
   </div>
   <script src="/js/onboarding.js"></script>
 </body>

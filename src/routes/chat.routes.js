@@ -1,27 +1,28 @@
 import express from "express";
 import Message from "../models/message.model.js";
+import User from "../models/user.model.js";
+
 const router = express.Router();
-
-router.post("/join-chat", (req, res) => {
-  const { username } = req.body;
-  if (!username) {
-    return res.status(400).json({ error: "Username is required" });
-  }
-
-  // Store the username in a session (if needed)
-  req.session.username = username; 
-
-  // Respond with success
-  res.status(200).json({ message: "User joined successfully" });
-});
 
 router.get("/chat", async (req, res) => {
     try {
         const messages = await Message.find().sort({ timestamp: 1 });
-        res.render("chat", { username: req.query.username, messages });
+
+        const { username } = req.query;
+        console.log("username : ", username);
+
+        // Fetch user from DB
+        const user = await User.findOne({ name: username });
+        console.log("user : ", user);
+
+        res.render("chat", {
+          username: user.name,
+          profilePicture: user.profilePicture, 
+          messages
+        });
     } catch (err) {
         console.error("Error fetching messages:", err);
-        res.render("chat", { username: req.query.username, messages: [] });
+        res.render("chat", { username: user.name, profilePicture: user.profilePicture, messages: [] });
     }
 });
 

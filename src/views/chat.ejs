@@ -17,6 +17,7 @@
 
     <div id="chat-container">
         <h3>Welcome, <%= username %>!</h3>
+        <img src="<%= profilePicture %>" alt="Profile Picture" width="50" height="50">
         <div id="messages">
             <!-- Dynamically poplate messages -->
             <% messages.forEach(msg => { %>

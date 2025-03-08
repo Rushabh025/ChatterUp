@@ -6,4 +6,5 @@ const UserSchema = new mongoose.Schema({
   online: { type: Boolean, default: false }
 });
 
-export default mongoose.model('User', UserSchema);
+const User =  mongoose.model('User', UserSchema);
+export default User;

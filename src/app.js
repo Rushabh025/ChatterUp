@@ -7,6 +7,7 @@ import http from "http";
 import cors from "cors";
 import { init } from "./config/socket.js";
 import chatRoutes from './routes/chat.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 export const app = express();
 
@@ -23,7 +24,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(path.resolve(), 'src', 'views'));
 
 app.use(express.static("public"));
-app.use(chatRoutes);
+
+// Use routes
+app.use("/", chatRoutes);
+app.use("/", userRoutes);
   
 // Serve the chat page
 app.get("/", (req, res) => {
