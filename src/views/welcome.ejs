@@ -2,35 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Welcome to ChatterUp</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-  <style>
-    #preview {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        display: none;
-    }
-</style>
 </head>
 <body>
-  <div id="welcome-container">
-    <h1>Welcome to ChatterUp!</h1>
 
-    <form id="onboarding-form">
-      <label for="username">Enter your name:</label>
-      <input type="text" id="username" placeholder="Enter your name" required>
+  <!-- Navbar -->
+  <nav class="navbar navbar-light bg-light shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-4 text-primary" href="/">ChatterUp</a>
+    </div>
+  </nav>
 
-      <label for="profilePic">Upload Profile Picture:</label>
-      <input type="file" id="profilePic" accept="image/*">
+  <!-- Welcome Section -->
+  <div class="container welcome-container " id="welcome-container">
+    <div class="row w-100">
+        <!-- Left: Signup Form -->
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-container w-100">
+                <h2 class="text-center text-primary mb-3">Join ChatterUp</h2>
+                <form id="onboarding-form">
+                    <div class="mb-3">
+                        <label class="form-label" for="username">Name</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter your name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profilePic" class="form-label">Upload Profile Picture</label>
+                        <input type="file" class="form-control" id="profilePic" accept="image/*">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Join Chat</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-      <!-- <img id="preview" src="/images/default-profile.jpg" alt="Profile Preview" style="width: 80px; height: 80px; border-radius: 50%; display: block;"> -->
+        <!-- Right: Chat Illustration -->
+        <div class="col-md-6 d-flex justify-content-center">
+            <img src="/images/chat-illustration.webp" alt="Chat with Friends" class="chat-image">
+        </div>
+    </div>
+</div>
 
-      <button type="submit">Join Chat</button>
-    </form>
+  <!-- Footer -->
+  <footer class="bg-light text-center p-3 mt-5">
+    <p class="mb-0">© 2025 ChatterUp. All rights reserved.</p>
+  </footer>
 
-  </div>
+  <!-- Script tags -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/js/onboarding.js"></script>
 </body>
 </html>
