@@ -79,7 +79,9 @@
         const activeUsersList = document.getElementById("activeUsers");
         const typingIndicator = document.getElementById('typingIndicator');
         const username = "<%= username %>"; 
-        const profilePicture = "<%= profilePicture %>"; 
+        const profilePicture = "<%= profilePicture %>";
+        // Load notification sound
+        const notificationSound = new Audio("/sounds/notification.wav"); 
         let typingTimeout;
 
         socket.emit("userJoined", username);
@@ -93,6 +95,8 @@
 
         socket.on("message", (msg) => {
             displayMessage(msg);
+            // Notify others except the sender
+            notificationSound.play().catch(err => console.error("Sound Error:", err));
         });
 
         function displayMessage(msg) {
